@@ -5,6 +5,7 @@ import (
 	"encoding/xml"
 	"io"
 	"os"
+	"sync"
 
 	"github.com/bodgit/sevenzip"
 	"github.com/rs/zerolog"
@@ -43,45 +44,81 @@ func extract_xml_to_page(fileIo io.Reader, pageChan chan *Page, bar *progressbar
 	}
 }
 
-func ParseBzipXML(filePathList []string) chan *Page {
+func ParseBzipXML(filePathList []string, threadCount int) chan *Page {
 	pageChan := make(chan *Page, 1000)
 	bar := progressbar.Default(-1)
+	filePathChan := make(chan string, 1000)
 
-	for _, filePath := range filePathList {
+	go func() {
+		for _, filePath := range filePathList {
+			filePathChan <- filePath
+		}
+	}()
+
+	wg := sync.WaitGroup{}
+	wg.Add(threadCount)
+	for i := 0; i < threadCount; i++ {
 		go func() {
-			fileIo, err := os.Open(filePath)
-			if err != nil {
-				log.Fatal().Err(err).Msg("Error while opening file")
+			for filePath := range filePathChan {
+				fileIo, err := os.Open(filePath)
+				if err != nil {
+					log.Fatal().Err(err).Str("filePath", filePath).Msg("Error while opening file")
+				}
+				bzio := bzip2.NewReader(fileIo)
+				extract_xml_to_page(bzio, pageChan, bar)
+				fileIo.Close()
 			}
-			defer fileIo.Close()
-
-			bzio := bzip2.NewReader(fileIo)
-			extract_xml_to_page(bzio, pageChan, bar)
+			wg.Done()
 		}()
 	}
+
+	go func() {
+		wg.Wait()
+		close(pageChan)
+	}()
+
 	return pageChan
 }
 
-func Parse7zXML(filePathList []string) chan *Page {
+func Parse7zXML(filePathList []string, threadCount int) chan *Page {
 	pageChan := make(chan *Page, 1000)
 	bar := progressbar.Default(-1)
 
-	for _, filePath := range filePathList {
+	filePathChan := make(chan string, 1000)
+
+	go func() {
+		for _, filePath := range filePathList {
+			filePathChan <- filePath
+		}
+	}()
+
+	wg := sync.WaitGroup{}
+	wg.Add(threadCount)
+	for i := 0; i < threadCount; i++ {
+
 		go func() {
-			r, err := sevenzip.OpenReader(filePath)
-			if err != nil {
-				log.Fatal().Err(err).Msg("Error while opening file")
-			}
-			defer r.Close()
+			for filePath := range filePathChan {
+				r, err := sevenzip.OpenReader(filePath)
+				if err != nil {
+					log.Fatal().Err(err).Str("filePath", filePath).Msg("Error while opening file")
+				}
 
-			rc, err := r.File[0].Open()
-			if err != nil {
-				log.Fatal().Err(err).Msg("Error while opening 7z file")
-			}
-			defer rc.Close()
+				rc, err := r.File[0].Open()
+				if err != nil {
+					log.Fatal().Err(err).Msg("Error while opening 7z file")
+				}
 
-			extract_xml_to_page(rc, pageChan, bar)
+				extract_xml_to_page(rc, pageChan, bar)
+				rc.Close()
+				r.Close()
+			}
 		}()
 	}
+
+	go func() {
+		wg.Wait()
+		close(pageChan)
+	}()
+
 	return pageChan
 }
