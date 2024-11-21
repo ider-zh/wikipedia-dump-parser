@@ -1,4 +1,4 @@
-module wikipedia-dump-parser
+module github.com/ider-zh/wikipedia-dump-parser
 
 go 1.23.2
 
