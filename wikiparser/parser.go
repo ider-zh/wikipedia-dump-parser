@@ -1,4 +1,4 @@
-package parser
+package wikiparser
 
 import (
 	"compress/bzip2"

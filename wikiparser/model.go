@@ -1,4 +1,4 @@
-package parser
+package wikiparser
 
 // json schema 注释
 type Text struct {
