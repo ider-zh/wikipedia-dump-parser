@@ -133,9 +133,7 @@ func Parse7zXmlMixedFlow(filePathList []string, threadCount int) (<-chan *Page, 
 	return pageChan, completedFileChan
 }
 
-type CallbackFunc func(pageChan <-chan *Page, filePath string)
-
-func ParseBzipXmlSeparateFlow(filePathList []string, threadCount int, callback CallbackFunc) {
+func ParseBzipXmlSeparateFlow(filePathList []string, threadCount int, callback func(pageChan <-chan *Page, filePath string)) {
 
 	filePathChan := make(chan string, 64)
 	bar := progressbar.Default(-1)
@@ -172,7 +170,7 @@ func ParseBzipXmlSeparateFlow(filePathList []string, threadCount int, callback C
 	wg.Wait()
 }
 
-func Parse7zXmlSeparateFlow(filePathList []string, threadCount int, callback CallbackFunc) {
+func Parse7zXmlSeparateFlow(filePathList []string, threadCount int, callback func(pageChan <-chan *Page, filePath string)) {
 
 	filePathChan := make(chan string, 2048)
 
