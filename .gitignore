@@ -1,1 +1,3 @@
 testdata
+*.pprof
+wikiparser.test
