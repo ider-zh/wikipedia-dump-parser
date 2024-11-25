@@ -2,7 +2,10 @@ module github.com/ider-zh/wikipedia-dump-parser
 
 go 1.23.2
 
-require github.com/schollz/progressbar/v3 v3.17.1
+require (
+	github.com/emirpasic/gods/v2 v2.0.0-alpha
+	github.com/schollz/progressbar/v3 v3.17.1
+)
 
 require (
 	github.com/andybalholm/brotli v1.1.1 // indirect

@@ -14,3 +14,5 @@ This is a Go project that provides a parser for Wikipedia XML dumps. The parser 
  go test -bench=. -benchmem -memprofile=mem.pprof -cpuprofile=cpu.pprof -blockprofile=block.pprof ./...
 
  go tool pprof -http="0.0.0.0:8080" mem.pprof  
+
+ 
