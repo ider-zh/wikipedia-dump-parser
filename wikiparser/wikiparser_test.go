@@ -31,7 +31,7 @@ func TestParseBzipXML(t *testing.T) {
 	for page := range pageChan {
 		i += 1
 		if i == 1 {
-			t.Logf("%+v", page)
+			t.Logf("%+v", page.Title)
 		}
 		// if page.Redirect != nil && page.Redirect.Title != "" {
 		// 	t.Logf("%+v", page.Redirect.Title)
@@ -48,7 +48,7 @@ func TestSpeparateSteam(t *testing.T) {
 		for page := range pageChan {
 			i += 1
 			if i == 1 {
-				t.Logf("%+v", page)
+				t.Logf("%+v", page.Title)
 			}
 			// if page.Redirect != nil && page.Redirect.Title != "" {
 			// 	t.Logf("%+v", page)
@@ -67,7 +67,7 @@ func TestSpeparateSteam(t *testing.T) {
 		for page := range pageChan {
 			i += 1
 			if i == 1 {
-				t.Logf("%+v", page)
+				t.Logf("%+v", page.Title)
 			}
 			// if page.Redirect != nil && page.Redirect.Title != "" {
 			// 	t.Logf("%+v", page)

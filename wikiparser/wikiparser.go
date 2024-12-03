@@ -142,9 +142,6 @@ TopToken:
 
 				}
 
-				if err := decoder.DecodeElement(&page, &t); err != nil {
-					log.Warn().Err(err).Msg("Error while decoding page")
-				}
 			}
 		case xml.EndElement:
 			//
@@ -332,8 +329,8 @@ func ParseBzipXmlSeparateFlow(filePathList []string, threadCount int, nsScope []
 	}()
 
 	wg := sync.WaitGroup{}
-	wg.Add(threadCount)
 	for i := 0; i < threadCount; i++ {
+		wg.Add(1)
 		go func() {
 			for filePath := range filePathChan {
 				fileIo, err := os.Open(filePath)
